@@ -57,6 +57,9 @@ const Register = () => import('@/views/pages/Register')
 const Users = () => import('@/views/users/Users')
 const User = () => import('@/views/users/User')
 
+// Campaigns
+const Campaigns = () => import('@/views/campaigns/Campaigns')
+
 Vue.use(Router)
 
 export default new Router({
@@ -77,32 +80,37 @@ function configRoutes () {
         {
           path: 'dashboard',
           name: 'Dashboard',
-          component: Dashboard
+          component: Dashboard // a view
         },
-        {
-          path: 'theme',
-          redirect: '/theme/colors',
-          name: 'Theme',
-          component: {
-            render (c) { return c('router-view') }
-          },
-          children: [
-            {
-              path: 'colors',
-              name: 'Colors',
-              component: Colors
-            },
-            {
-              path: 'typography',
-              name: 'Typography',
-              component: Typography
-            }
-          ]
-        },
+        // {
+        //   path: 'theme',
+        //   redirect: '/theme/colors',
+        //   name: 'Theme',
+        //   component: {
+        //     render (c) { return c('router-view') }
+        //   },
+        //   children: [
+        //     {
+        //       path: 'colors',
+        //       name: 'Colors',
+        //       component: Colors
+        //     },
+        //     {
+        //       path: 'typography',
+        //       name: 'Typography',
+        //       component: Typography
+        //     }
+        //   ]
+        // },
         {
           path: 'charts',
           name: 'Charts',
-          component: Charts
+          component: Charts // a view
+        },
+        {
+          path: 'campaigns',
+          name: 'Campaigns',
+          component: Campaigns // a view
         },
         {
           path: 'widgets',
@@ -137,7 +145,7 @@ function configRoutes () {
         },
         {
           path: 'base',
-          redirect: '/base/cards',
+          redirect: '/base/forms',
           name: 'Base',
           component: {
             render (c) { return c('router-view') }
@@ -225,61 +233,61 @@ function configRoutes () {
             }
           ]
         },
-        {
-          path: 'buttons',
-          redirect: '/buttons/standard-buttons',
-          name: 'Buttons',
-          component: {
-            render (c) { return c('router-view') }
-          },
-          children: [
-            {
-              path: 'standard-buttons',
-              name: 'Standard Buttons',
-              component: StandardButtons
-            },
-            {
-              path: 'button-groups',
-              name: 'Button Groups',
-              component: ButtonGroups
-            },
-            {
-              path: 'dropdowns',
-              name: 'Dropdowns',
-              component: Dropdowns
-            },
-            {
-              path: 'brand-buttons',
-              name: 'Brand Buttons',
-              component: BrandButtons
-            }
-          ]
-        },
-        {
-          path: 'icons',
-          redirect: '/icons/coreui-icons',
-          name: 'CoreUI Icons',
-          component: {
-            render (c) { return c('router-view') }
-          },
-          children: [
-            {
-              path: 'coreui-icons',
-              name: 'Icons library',
-              component: CoreUIIcons
-            },
-            {
-              path: 'brands',
-              name: 'Brands',
-              component: Brands
-            },
-            {
-              path: 'flags',
-              name: 'Flags',
-              component: Flags
-            }
-          ]
-        },
+        // {
+        //   path: 'buttons',
+        //   redirect: '/buttons/standard-buttons',
+        //   name: 'Buttons',
+        //   component: {
+        //     render (c) { return c('router-view') }
+        //   },
+        //   children: [
+        //     {
+        //       path: 'standard-buttons',
+        //       name: 'Standard Buttons',
+        //       component: StandardButtons
+        //     },
+        //     {
+        //       path: 'button-groups',
+        //       name: 'Button Groups',
+        //       component: ButtonGroups
+        //     },
+        //     {
+        //       path: 'dropdowns',
+        //       name: 'Dropdowns',
+        //       component: Dropdowns
+        //     },
+        //     {
+        //       path: 'brand-buttons',
+        //       name: 'Brand Buttons',
+        //       component: BrandButtons
+        //     }
+        //   ]
+        // },
+        // {
+        //   path: 'icons',
+        //   redirect: '/icons/coreui-icons',
+        //   name: 'CoreUI Icons',
+        //   component: {
+        //     render (c) { return c('router-view') }
+        //   },
+        //   children: [
+        //     {
+        //       path: 'coreui-icons',
+        //       name: 'Icons library',
+        //       component: CoreUIIcons
+        //     },
+        //     {
+        //       path: 'brands',
+        //       name: 'Brands',
+        //       component: Brands
+        //     },
+        //     {
+        //       path: 'flags',
+        //       name: 'Flags',
+        //       component: Flags
+        //     }
+        //   ]
+        // },
         {
           path: 'notifications',
           redirect: '/notifications/alerts',

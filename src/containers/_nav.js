@@ -1,3 +1,10 @@
+// - dette er hva som faktisk dukker opp i UI'en... 
+// - handlingene styres i routes/index.js
+// - ved å fjerne begge, blir det borte i UI'en og handlingen blir borte
+// - ved å fjerne bare routeren, forblir den i UI'en, men redirecter til tom side på path
+// - html til sidene ligger i /views/ folderen
+
+
 export default [
   {
     _name: 'CSidebarNav',
@@ -12,25 +19,37 @@ export default [
           text: 'NEW'
         }
       },
+      // {
+      //   _name: 'CSidebarNavTitle',
+      //   _children: ['Theme']
+      // },
+      // {
+      //   _name: 'CSidebarNavItem',
+      //   name: 'Colors',
+      //   to: '/theme/colors',
+      //   icon: 'cil-drop'
+      // },
+      // {
+      //   _name: 'CSidebarNavItem',
+      //   name: 'Typography',
+      //   to: '/theme/typography',
+      //   icon: 'cil-pencil'
+      // },
       {
         _name: 'CSidebarNavTitle',
-        _children: ['Theme']
+        _children: ['Overview']
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'Colors',
-        to: '/theme/colors',
-        icon: 'cil-drop'
+        name: 'Campaigns',
+        to: '/campaigns',
+        icon: 'cil-layers'
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'Typography',
-        to: '/theme/typography',
-        icon: 'cil-pencil'
-      },
-      {
-        _name: 'CSidebarNavTitle',
-        _children: ['Components']
+        name: 'Users',
+        to: '/users',
+        icon: 'cil-layers'
       },
       {
         _name: 'CSidebarNavDropdown',
@@ -104,60 +123,61 @@ export default [
           }
         ]
       },
-      {
-        _name: 'CSidebarNavDropdown',
-        name: 'Buttons',
-        route: '/buttons',
-        icon: 'cil-cursor',
-        items: [
-          {
-            name: 'Buttons',
-            to: '/buttons/standard-buttons'
-          },
-          {
-            name: 'Button Dropdowns',
-            to: '/buttons/dropdowns'
-          },
-          {
-            name: 'Button Groups',
-            to: '/buttons/button-groups'
-          },
-          {
-            name: 'Brand Buttons',
-            to: '/buttons/brand-buttons'
-          }
-        ]
-      },
+      // {
+      //   _name: 'CSidebarNavDropdown',
+      //   name: 'Buttons',
+      //   route: '/buttons',
+      //   icon: 'cil-cursor',
+      //   items: [
+      //     {
+      //       name: 'Buttons',
+      //       to: '/buttons/standard-buttons'
+      //     },
+      //     {
+      //       name: 'Button Dropdowns',
+      //       to: '/buttons/dropdowns'
+      //     },
+      //     {
+      //       name: 'Button Groups',
+      //       to: '/buttons/button-groups'
+      //     },
+      //     {
+      //       name: 'Brand Buttons',
+      //       to: '/buttons/brand-buttons'
+      //     }
+      //   ]
+      // },
       {
         _name: 'CSidebarNavItem',
         name: 'Charts',
         to: '/charts',
         icon: 'cil-chart-pie'
       },
-      {
-        _name: 'CSidebarNavDropdown',
-        name: 'Icons',
-        route: '/icons',
-        icon: 'cil-star',
-        items: [
-          {
-            name: 'CoreUI Icons',
-            to: '/icons/coreui-icons',
-            badge: {
-              color: 'info',
-              text: 'NEW'
-            }
-          },
-          {
-            name: 'Brands',
-            to: '/icons/brands'
-          },
-          {
-            name: 'Flags',
-            to: '/icons/flags'
-          }
-        ]
-      },
+      
+      // {
+      //   _name: 'CSidebarNavDropdown',
+      //   name: 'Icons',
+      //   route: '/icons',
+      //   icon: 'cil-star',
+      //   items: [
+      //     {
+      //       name: 'CoreUI Icons',
+      //       to: '/icons/coreui-icons',
+      //       badge: {
+      //         color: 'info',
+      //         text: 'NEW'
+      //       }
+      //     },
+      //     {
+      //       name: 'Brands',
+      //       to: '/icons/brands'
+      //     },
+      //     {
+      //       name: 'Flags',
+      //       to: '/icons/flags'
+      //     }
+      //   ]
+      // },
       {
         _name: 'CSidebarNavDropdown',
         name: 'Notifications',

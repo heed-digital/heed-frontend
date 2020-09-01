@@ -4,6 +4,7 @@
       <CCard>
         <CCardHeader>
           Users
+          <button v-on:click="fetchUsers"> Click me!</button>
         </CCardHeader>
         <CCardBody>
           <CDataTable
@@ -11,7 +12,7 @@
             striped
             :items="items"
             :fields="fields"
-            :items-per-page="5"
+            :items-per-page="10"
             clickable-rows
             :active-page="activePage"
             @row-clicked="rowClicked"
@@ -25,6 +26,7 @@
                 </CBadge>
               </td>
             </template>
+            
           </CDataTable>
         </CCardBody>
       </CCard>
@@ -36,14 +38,15 @@
 import usersData from './UsersData'
 export default {
   name: 'Users',
-  data () {
+  data (items) {
     return {
       items: usersData,
       fields: [
         { key: 'username', label: 'Name', _classes: 'font-weight-bold' },
         { key: 'registered' },
         { key: 'role' },
-        { key: 'status' }
+        { key: 'status' },
+
       ],
       activePage: 1
     }
@@ -73,6 +76,14 @@ export default {
     },
     pageChange (val) {
       this.$router.push({ query: { page: val }})
+    },
+    fetchUsers: function () {
+      const baseURI = 'https://api.heed.digital/accounts/random-id/users'
+      this.$http.get(baseURI)
+      .then((result) => {
+        this.items = result.data
+        console.log('result', result.data);
+      })
     }
   }
 }

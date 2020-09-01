@@ -9,5 +9,9 @@ module.exports = {
   },
   transpileDependencies: [
     '@coreui/utils'
-  ]
+  ],
+  devServer: {
+    // proxy: 'https://heed.digital/',
+    proxy: 'http://localhost:8080/',
+  }
 }
