@@ -3,7 +3,7 @@
     <CCol col="12">
       <CCard>
         <CCardHeader>
-          User id:  {{ $route.params.id }}
+          Campaign Details
         </CCardHeader>
         <CCardBody>
           <CDataTable
@@ -25,41 +25,41 @@
 <script>
 // import usersData from './UsersData'
 export default {
-  name: 'User',
+  name: 'Campaign',
   beforeRouteEnter(to, from, next) {
     next(vm => {
-      vm.usersOpened = from.fullPath.includes('users')
+      vm.campaignsOpened = from.fullPath.includes('campaigns')
     })
   },
   data () {
     return {
-      usersOpened: null
+      campaignsOpened: null
     }
   },
   computed: {
     fields () {
       return [
-        { key: 'key', label: this.email, _style: 'width:150px'},
+        { key: 'key', label: this.name, _style: 'width:150px'},
         { key: 'value', label: '', _style: 'width:150px;' }
       ]
     },
-    userData () {
+    campaignData () {
       const id = this.$route.params.id
-      const user = (this.$store && this.$store.users) ? this.$store.users.find((user, index) => index + 1 == id) : false;
-      const userDetails = user ? Object.entries(user) : [['id', 'Not found']]
-      return userDetails.map(([key, value]) => { return { key, value } })
+      const campaign = (this.$store && this.$store.campaigns) ? this.$store.campaigns.find((user, index) => index + 1 == id) : false;
+      const campaignDetails = campaign ? Object.entries(campaign) : [['id', 'Not found']]
+      return campaignDetails.map(([key, value]) => { return { key, value } })
     },
     visibleData () {
-      return this.userData.filter(param => param.key !== 'username')
+      return this.campaignData.filter(param => param.key !== 'username')
     },
     username () {
-      return this.userData.filter(param => param.key === 'username')[0].value
+      return this.campaignData.filter(param => param.key === 'username')[0].value
     }
   },
   methods: {
     goBack() {
-      console.log('this.usersOpened', this.usersOpened);
-      this.usersOpened ? this.$router.go(-1) : this.$router.push({path: '/users'})
+      console.log('this.campaignsOpened', this.campaignsOpened);
+      this.$router.push({path: '/campaigns'})
     }
   }
 }
