@@ -44,6 +44,8 @@
 
 <script>
 // import usersData from './UsersData'
+import _ from 'lodash';
+
 export default {
   name: 'Users',
   data () {
@@ -55,7 +57,6 @@ export default {
         { key: 'email', label: 'Email', _classes: 'font-weight-bold' },
         { key: 'department' },
         { key: 'phone'},
-
       ],
       activePage: 1
     }
@@ -81,7 +82,8 @@ export default {
       }
     },
     rowClicked (item, index) {
-      this.$router.push({path: `users/${index + 1}`})
+      console.log('item', item);
+      this.$router.push({path: 'users/' + item.id})
     },
     pageChange (val) {
       this.$router.push({ query: { page: val }})
@@ -94,19 +96,23 @@ export default {
       console.log('importUsers');
     },
     fetchUsers () {
-      var account_id = 'dummy202';
-      var endpoint = '/accounts/' + account_id + '/users'
+      var endpoint = '/accounts/' + getAccountId() + '/users';
       this.$http.get(endpoint)
       
       .then((result) => {
-        
+
+        console.log('result', result);
+        // clean up results
+        var clean = _.filter(result.data.users, function (r) {
+          return !_.isNull(r);
+        });
+
         // update data
-        this.items = result.data; 
+        this.items = clean; 
 
         // store
-        this.$store.users = result.data;
+        this.$store.users = clean;
 
-        console.log('result', result.data);
       })
       .catch((error) => {
         console.log('axios error: ', error);

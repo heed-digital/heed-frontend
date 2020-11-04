@@ -56,21 +56,30 @@
       <CBadge color="primary" class="mfs-auto">{{ itemsCount }}</CBadge>
     </CDropdownItem>
     <CDropdownDivider/>
-    <CDropdownItem>
+    <!-- <CDropdownItem>
       <CIcon name="cil-shield-alt" /> Lock Account
-    </CDropdownItem>
-    <CDropdownItem>
-      <CIcon name="cil-lock-locked" /> Logout
+    </CDropdownItem> -->
+    <CDropdownItem v-on:click="onClickLogout">
+      <CIcon  name="cil-lock-locked" /> Logout
     </CDropdownItem>
   </CDropdown>
 </template>
 
 <script>
+import { Auth } from 'aws-amplify';
+
 export default {
   name: 'TheHeaderDropdownAccnt',
   data () {
     return { 
       itemsCount: 42
+    }
+  },
+  methods : {
+    onClickLogout () {
+      console.log('logout');
+      Auth.signOut();
+      this.$router.push('/login');
     }
   }
 }

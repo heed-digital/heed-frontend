@@ -12,6 +12,7 @@
                   <CInput
                     placeholder="Username"
                     autocomplete="username email"
+                    v-on:update:value="onInputUsername"
                   >
                     <template #prepend-content><CIcon name="cil-user"/></template>
                   </CInput>
@@ -19,16 +20,16 @@
                     placeholder="Password"
                     type="password"
                     autocomplete="curent-password"
+                    v-on:update:value="onInputPass"
                   >
                     <template #prepend-content><CIcon name="cil-lock-locked"/></template>
                   </CInput>
                   <CRow>
-                    <CCol col="6" class="text-left">
-                      <CButton color="primary" class="px-4">Login</CButton>
+                    <CCol col="4" class="text-left">
+                      <CButton color="primary" class="px-4" v-on:click="onClickSignIn">Login</CButton>
                     </CCol>
-                    <CCol col="6" class="text-right">
+                    <CCol col="8" class="text-right">
                       <CButton color="link" class="px-0">Forgot password?</CButton>
-                      <CButton color="link" class="d-lg-none">Register now!</CButton>
                     </CCol>
                   </CRow>
                 </CForm>
@@ -47,6 +48,7 @@
                   color="light"
                   variant="outline"
                   size="lg"
+                  v-on:click="onClickRegister"
                 >
                   Register Now!
                 </CButton>
@@ -60,7 +62,56 @@
 </template>
 
 <script>
+import { Auth } from 'aws-amplify';
+
 export default {
-  name: 'Login'
+  name: 'Login',
+  created () {
+      this.$store.username = ''; // make sure it's clean & ready
+      this.$store.pass = ''; // make sure it's clean & ready
+  },
+  methods : {
+    onClickRegister () {
+      this.$router.push('/register')
+    },
+
+    onClickSignIn () {
+
+      // context
+      var ctx = this;
+
+      // get vars
+      var username = this.$store.username;
+      var pass = this.$store.pass;
+      try {
+
+            // sign in
+            Auth.signIn(username, pass)
+
+            // handle success
+            .then(function (result) {
+               console.log('Auth.signIn: user', result);
+               ctx.$router.push('/');
+            })
+
+            // handle error
+            .catch(function (err) {
+              console.log('Auth.signIn: err', err);
+            });
+
+        // handle general errors
+        } catch (error) {
+            console.log('Auth.signIn: error signing in', error);
+        }
+    },
+   
+    onInputUsername(val) {
+        this.$store.username = val;
+    },
+    onInputPass(val) {
+        this.$store.pass = val;
+    },
+  }
 }
+
 </script>

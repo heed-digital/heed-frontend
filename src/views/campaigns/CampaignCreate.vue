@@ -11,8 +11,6 @@
             v-on:update:value="onCampaignNameInput"
             />
         </CCol>
-        </CRow>
-        <CRow>
         <CCol sm="6">
             <CSelect
             label="Frequency"
@@ -23,42 +21,54 @@
             />
         </CCol>
         <CCol sm="6">
-            <CInput
-            label="Start date"
-            placeholder="Set a start date"
-            v-on:update:value="onCampaignStartdateInput"
-            description="Set date in format DD/MM/YY"
-            />
+            <div style="padding-bottom:5px">Start date</div>
+            <datepicker @selected="onCampaignStartdateInput" :inline="true" :monday-first="true ":full-month-name="true" :language="nbNO" :disabled-dates="state.disabledDates"></datepicker>
         </CCol>
-         </CRow>
-        <CRow>
         <CCol sm="6">
             <CInputCheckbox
-            label="Campaign active"
+            label="Campaign is active"
             checked
             v-on:update:checked="onCampaignActiveInput"
             description="Campaign is active or inactive"
             />
         </CCol>
+        
+         </CRow>
+        <CRow>
+        
         </CRow>
-        <button class="btn btn-light text-center float-right" v-on:click="onCancel" style="margin-left: 10px">Cancel</button>
-        <button class="btn btn-dark text-center float-right" v-on:click="onSubmitCampaign"><b>Create Campaign</b></button>
+        <button class="btn btn-light text-center float-right" v-on:click="onCancel" style="margin-left: 10px; margin-top: 20px; margin-bottom:20px">Cancel</button>
+        <button class="btn btn-dark text-center float-right" v-on:click="onSubmitCampaign" style="margin-left: 10px; margin-top: 20px; margin-bottom:20px"><b>Create campaign</b></button>
     </CForm>
   </div>
   </CCard>
 </template>
 
 <script>
-// import usersData from './UsersData'
+import Datepicker from 'vuejs-datepicker';
+import {en, nbNO} from 'vuejs-datepicker/dist/locale'
+
 export default {
     name: 'CampaignCreate',
+    components : {
+        Datepicker
+    },
     data () {
         return {
             message: "",
+            state : {
+                disabledDates: {
+                    to: new Date(new Date().setDate(new Date().getDate() - 1)), // Disable all dates up to and not including today
+                }
+            },
+            en : en,
+            nbNO : nbNO
         }
     },
     created () {
-        this.$store.create_campaign = {}; // make sure it's clean & ready
+        this.$store.create_campaign = {
+            active : true // default
+        }; // make sure it's clean & ready
     },
     methods: {
         onSubmitCampaign (val) {
@@ -71,13 +81,13 @@ export default {
             // post
             this.$http.post(endpoint, this.$store.create_campaign,
             {
-                headers: {'X-Heed-Account-Id': 'dummy202'}, // todo: use cognito instead
+                headers: {'X-Heed-Account-Id': getAccountId()}, // todo: use cognito instead
             })
-            .then(response => {
+            .then(function (response) {
                 console.log('created new campaign: ', response);
             })
-            .catch(e => {
-                console.log('axios post error: ', e);
+            .catch(function (err) {
+                console.log('axios post error: ', err, err.response);
             });
 
             // return to campaigns screen
@@ -103,6 +113,8 @@ export default {
         },
         onCampaignStartdateInput(val) {
             this.onInput('start_date', val);
+            this.$store.create_campaign.start_date = val;
+            console.log('this.store', this.$store.create_campaign); 
         },
         onCampaignActiveInput(val) {
             this.onInput('active', val);

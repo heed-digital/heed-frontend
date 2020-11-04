@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-heedfrontend-dev-163103-authRole",
+      "UnauthRoleArn": "arn:aws:iam::337361826764:role/amplify-heedfrontend-dev-163103-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::337361826764:role/amplify-heedfrontend-dev-163103-authRole",
+      "Region": "eu-west-1",
+      "DeploymentBucketName": "amplify-heedfrontend-dev-163103-deployment",
+      "UnauthRoleName": "amplify-heedfrontend-dev-163103-unauthRole",
+      "StackName": "amplify-heedfrontend-dev-163103",
+      "StackId": "arn:aws:cloudformation:eu-west-1:337361826764:stack/amplify-heedfrontend-dev-163103/c01ef8b0-ff3b-11ea-99f1-0a8b4422ec0a",
+      "AmplifyAppId": "d2p9ulmdv7bb9j"
+    }
+  }
+}

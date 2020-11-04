@@ -1,66 +1,139 @@
 <template>
-  <CRow>
-    <CCol col="12">
-      <CCard>
-        <CCardHeader>
-          Campaign Details
-        </CCardHeader>
-        <CCardBody>
-          <CDataTable
-            striped
-            small
-            fixed
-            :items="visibleData"
-            :fields="fields"
-          />
-        </CCardBody>
-        <CCardFooter>
-          <CButton class="btn btn-light float-right" @click="goBack">Close</CButton>
-        </CCardFooter>
-      </CCard>
-    </CCol>
-  </CRow>
+<CCard style="padding: 20px"> 
+    <h3>Campaign</h3>
+  <div>
+    <CForm>
+        <CRow>
+        <CCol sm="6">
+            <CInput
+            label="Campaign name"
+            placeholder="Campaign name"
+            v-on:update:value="onCampaignNameInput"
+            :value="campaignData.name"
+            />
+        </CCol>
+        <CCol sm="6">
+            <CSelect
+            label="Frequency"
+            :options="['Twice daily', 'Daily', 'Four times per week', 'Three times per week', 'Twice per week', 'Weekly']"
+            v-on:update:value="onFrequencyInput"
+            placeholder="Set frequency"
+            description="How often learning modules are sent"
+            />
+        </CCol>
+        <CCol sm="6">
+            <div style="padding-bottom:5px">Start date</div>
+            <!-- <CForm :inline="true" :label="Set a date"> -->
+            <datepicker :inline="true" :monday-first="true ":full-month-name="true" :language="nbNO" :disabled-dates="state.disabledDates"></datepicker>
+            <!-- </CForm> -->
+        </CCol>
+        <CCol sm="6">
+            <CInputCheckbox
+            label="Campaign active"
+            checked
+            v-on:update:checked="onCampaignActiveInput"
+            description="Campaign is active or inactive"
+            />
+        </CCol>
+        
+         </CRow>
+        <CRow>
+        
+        </CRow>
+        <button class="btn btn-light text-center float-right" v-on:click="onCancel" style="margin-left: 10px; margin-top: 20px; margin-bottom:20px">Close</button>
+        <button class="btn btn-dark text-center float-right" v-on:click="onSubmitCampaign" style="margin-left: 10px; margin-top: 20px; margin-bottom:20px"><b>Update campaign</b></button>
+    </CForm>
+  </div>
+  </CCard>
 </template>
 
 <script>
-// import usersData from './UsersData'
+import Datepicker from 'vuejs-datepicker';
+import {en, nbNO} from 'vuejs-datepicker/dist/locale'
+
 export default {
-  name: 'Campaign',
-  beforeRouteEnter(to, from, next) {
-    next(vm => {
-      vm.campaignsOpened = from.fullPath.includes('campaigns')
-    })
-  },
-  data () {
-    return {
-      campaignsOpened: null
-    }
-  },
-  computed: {
-    fields () {
-      return [
-        { key: 'key', label: this.name, _style: 'width:150px'},
-        { key: 'value', label: '', _style: 'width:150px;' }
-      ]
+    name: 'CampaignCreate',
+    components : {
+        Datepicker
     },
-    campaignData () {
-      const id = this.$route.params.id
-      const campaign = (this.$store && this.$store.campaigns) ? this.$store.campaigns.find((user, index) => index + 1 == id) : false;
-      const campaignDetails = campaign ? Object.entries(campaign) : [['id', 'Not found']]
-      return campaignDetails.map(([key, value]) => { return { key, value } })
+    data () {
+        return {
+            message: "",
+            // name : campaignName(),
+            state : {
+                disabledDates: {
+                    to: new Date(new Date().setDate(new Date().getDate() - 1)), // Disable all dates up to and not including today
+                }
+            },
+            en : en,
+            nbNO : nbNO
+        }
     },
-    visibleData () {
-      return this.campaignData.filter(param => param.key !== 'username')
+    created () {
+        this.$store.create_campaign = {}; // make sure it's clean & ready
     },
-    username () {
-      return this.campaignData.filter(param => param.key === 'username')[0].value
+    computed : {
+        campaignData () {
+            const id = this.$route.params.id
+            console.error('this.$store', this.$store);
+            const campaign = (this.$store && this.$store.campaigns) ? this.$store.campaigns.find((campaign, index) => campaign.id == id) : false;
+            console.log('campaign', campaign);
+            const campaignDetails = campaign ? Object.entries(campaign) : [['id', 'Not found']]
+            var details = campaignDetails.map(([key, value]) => { return { key, value } })
+            console.log('details,', details);
+            return details;
+        },
+    },
+    methods: {
+        campaignName () {
+            return 'debug-fn-name'
+        },
+        onSubmitCampaign (val) {
+            
+            console.log('submitCampaign', this.$store.create_campaign);
+
+            // set endpoint
+            var endpoint = '/campaigns';
+
+            // post
+            this.$http.post(endpoint, this.$store.create_campaign,
+            {
+                headers: {'X-Heed-Account-Id': getAccountId()}, // todo: use cognito instead
+            })
+            .then(function (response) {
+                console.log('created new campaign: ', response);
+            })
+            .catch(function (err) {
+                console.log('axios post error: ', err, err.response);
+            });
+
+            // return to campaigns screen
+            this.$router.push({path: '/campaigns'})
+
+        },
+        onCancel () {
+          console.log('cancel');
+          this.$router.push({path: '/campaigns'})
+        },
+        validator(val) {
+            return val ? val.length >= 4 : false
+        },
+        onInput(key, val) {
+            this.$store.create_campaign[key] = val;
+            console.log('this.store', this.$store.create_campaign); 
+        },
+        onCampaignNameInput(val) {
+            this.onInput('name', val);
+        },
+        onFrequencyInput(val) {
+            this.onInput('frequency', val);
+        },
+        onCampaignStartdateInput(val) {
+            this.onInput('start_date', val);
+        },
+        onCampaignActiveInput(val) {
+            this.onInput('active', val);
+        },
     }
-  },
-  methods: {
-    goBack() {
-      console.log('this.campaignsOpened', this.campaignsOpened);
-      this.$router.push({path: '/campaigns'})
-    }
-  }
 }
 </script>

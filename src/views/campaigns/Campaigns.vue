@@ -43,14 +43,18 @@
 
 <script>
 // import usersData from './UsersData'
+import _ from 'lodash';
+
 export default {
   name: 'Campaigns',
   data () {
     return {
       items: this.$store.campaigns || this.fetchCampaigns(),
+      // items: this.$store.getters.campaigns || this.fetchCampaigns(), // does not work!
       fields: [
         { key: 'name' },
         { key: 'start_date' },
+        { key: 'active' },
 
       ],
       activePage: 1
@@ -69,7 +73,7 @@ export default {
   methods: {
    
     rowClicked (item, index) {
-      this.$router.push({path: `campaigns/${index + 1}`})
+      this.$router.push({path: 'campaigns/' + item.id})
     },
     pageChange (val) {
       this.$router.push({ query: { page: val }})
@@ -79,32 +83,40 @@ export default {
       this.$router.push({path: 'campaigns/create'})
     },
     fetchCampaigns () {
-      var account_id = 'dummy202';
-      var endpoint = '/accounts/' + account_id + '/campaigns'
-      this.$http.get(endpoint)
+
+      var endpoint = '/campaigns'
+      this.$http.get(endpoint,
+      {
+          headers: {'X-Heed-Account-Id': getAccountId()},
+      })
       
       .then((result) => {
+
+        console.log('campaign fetch result', result);
+
+        // clean up results
+        var clean = _.filter(result.data, function (r) {
+          return !_.isNull(r);
+        });
         
         // update data
-        this.items = result.data; 
+        // this.items = clean;
 
         // store
-        this.$store.campaigns = result.data;
+        this.$store.campaigns = clean;
+        // this.$store.commit('setCampaigns', clean);
 
-        console.log('result', result.data);
+        console.log('raw result', result.data);
+        console.log('cleaned data: ', clean);
+        console.log('store: ', this.$store);
+        console.log('store getter', this.$store.getters.campaigns); // endless recursive.. something very wrong.
+
       })
       .catch((error) => {
-        console.log('axios error: ', error);
+        console.log('axios error: ', error, error.response);
       });
     }
   }
 }
 
-// import * as Campaigns from './index.js'
-// export default {
-//   name: 'Campaigns',
-//   components: {
-//     ...Campaigns
-//   }
-// }
 </script>

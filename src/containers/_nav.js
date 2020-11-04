@@ -45,23 +45,31 @@ export default [
         _name: 'CSidebarNavTitle',
         _children: ['Extras']
       },
-     
       {
-        _name: 'CSidebarNavItem',
-        name: 'Download CoreUI',
-        href: 'http://coreui.io/vue/',
-        icon: { name: 'cil-cloud-download', class: 'text-white' },
-        _class: 'bg-success text-white',
-        target: '_blank'
+        _name: 'CSidebarNavDropdown',
+        name: 'Pages',
+        route: '/login',
+        icon: 'cil-star',
+        items: [
+          {
+            name: 'Login',
+            to: '/login'
+          },
+          {
+            name: 'Register',
+            to: '/pages/register'
+          },
+          {
+            name: 'Error 404',
+            to: '/pages/404'
+          },
+          {
+            name: 'Error 500',
+            to: '/pages/500'
+          }
+        ]
       },
-      {
-        _name: 'CSidebarNavItem',
-        name: 'Try CoreUI PRO',
-        href: 'http://coreui.io/pro/vue/',
-        icon: { name: 'cil-layers', class: 'text-white' },
-        _class: 'bg-danger text-white',
-        target: '_blank'
-      }
+     
     ]
   }
 ]

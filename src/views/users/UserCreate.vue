@@ -106,17 +106,17 @@ export default {
             // post
             this.$http.post(endpoint, this.$store.create_user,
             {
-                headers: {'X-Heed-Account-Id': 'dummy202'}, // todo: use cognito instead
+                headers: {'X-Heed-Account-Id': getAccountId()}, // todo: use cognito instead
             })
             .then(response => {
                 console.log('created new user: ', response);
+                
+                // return to users screen
+                this.$router.push({path: '/users'})
             })
             .catch(e => {
                 console.log('axios post error: ', e);
             });
-
-            // return to users screen
-            this.$router.push({path: '/users'})
 
         },
         onCancel () {
