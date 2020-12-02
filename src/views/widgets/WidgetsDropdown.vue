@@ -1,7 +1,7 @@
 <template>
   <CRow>
     <CCol sm="6" lg="3">
-      <CWidgetDropdown color="primary" header="9.823" text="Members online">
+      <CWidgetDropdown color="primary" header="12.823" text="Lessons sent">
         <template #default>
           <CDropdown
             color="transparent p-0"
@@ -23,14 +23,14 @@
             style="height:70px"
             :data-points="[65, 59, 84, 84, 51, 55, 40]"
             point-hover-background-color="primary"
-            label="Members"
+            label="Lessons"
             labels="months"
           />
         </template>
       </CWidgetDropdown>
     </CCol>
     <CCol sm="6" lg="3">
-      <CWidgetDropdown color="info" header="9.823" text="Members online">
+      <CWidgetDropdown color="info" header="9.823" text="Lessons passed">
         <template #default>
           <CDropdown
             color="transparent p-0"
@@ -63,8 +63,8 @@
     <CCol sm="6" lg="3">
       <CWidgetDropdown
         color="warning"
-        header="9.823"
-        text="Members online"
+        header="2.823"
+        text="Lessons Pending "
       >
         <template #default>
           <CDropdown
@@ -97,8 +97,8 @@
     <CCol sm="6" lg="3">
       <CWidgetDropdown
         color="danger"
-        header="9.823"
-        text="Members online"
+        header="4.823"
+        text="Lessons failed"
       >
         <template #default>
           <CDropdown
