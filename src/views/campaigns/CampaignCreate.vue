@@ -22,7 +22,14 @@
         </CCol>
         <CCol sm="6">
             <div style="padding-bottom:5px">Start date</div>
-            <datepicker @selected="onCampaignStartdateInput" :inline="true" :monday-first="true ":full-month-name="true" :language="nbNO" :disabled-dates="state.disabledDates"></datepicker>
+            <datepicker 
+            @selected="onCampaignStartdateInput" 
+            :inline="true" 
+            :monday-first="true" 
+            :full-month-name="true" 
+            :language="nbNO" 
+            :disabled-dates="state.disabledDates">
+            </datepicker>
         </CCol>
         <CCol sm="6">
             <CInputCheckbox
@@ -38,7 +45,7 @@
         
         </CRow>
         <button class="btn btn-light text-center float-right" v-on:click="onCancel" style="margin-left: 10px; margin-top: 20px; margin-bottom:20px">Cancel</button>
-        <button class="btn btn-dark text-center float-right" v-on:click="onSubmitCampaign" style="margin-left: 10px; margin-top: 20px; margin-bottom:20px"><b>Create campaign</b></button>
+        <button class="btn btn-success text-center float-right" v-on:click="onSubmitCampaign" style="margin-left: 10px; margin-top: 20px; margin-bottom:20px"><b>Create campaign</b></button>
     </CForm>
   </div>
   </CCard>

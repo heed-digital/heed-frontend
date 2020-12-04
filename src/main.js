@@ -7,6 +7,7 @@ import { iconsSet as icons } from './assets/icons/icons.js'
 import store from './store'
 import axios from 'axios'
 import { freeSet } from '@coreui/icons'
+import VueLuxon from "vue-luxon";
 
 // amplify
 import Auth from '@aws-amplify/auth';
@@ -21,6 +22,16 @@ Vue.use(CoreuiVue)
 Vue.prototype.$log = console.log.bind(console)
 Vue.prototype.$http = axios.create ({
   baseURL : 'https://api.heed.to',
+});
+
+Vue.use(VueLuxon, {
+    input: {
+        zone: "utc",
+    },
+    output: {
+      zone: "local",
+      locale: 'no'
+    }
 });
 
 // global error listener

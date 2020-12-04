@@ -20,3 +20,26 @@
   background-color: blue;
   
 }
+
+body.c-dark-theme .vdp-datepicker__calendar {
+  
+  background: none;
+ 
+}
+
+body.c-dark-theme .vdp-datepicker__calendar header .prev:not(.disabled):hover {
+  background: #6c6e7e; 
+}
+
+body.c-dark-theme .vdp-datepicker__calendar header .next:not(.disabled):hover {
+  background: #6c6e7e; 
+
+}
+body.c-dark-theme .vdp-datepicker__calendar header .up:not(.disabled):hover {
+  background: #6c6e7e; 
+}
+
+body.c-dark-theme .vdp-datepicker__calendar header .next:after {
+  border-left: 10px solid #ddd;
+  margin-left: 5px;
+}

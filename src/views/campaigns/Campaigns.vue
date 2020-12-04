@@ -12,28 +12,32 @@
           <CDataTable
             hover
             striped
+            clickable-rows
             :items="items"
             :fields="fields"
             :items-per-page="20"
-            clickable-rows
             :sorter='{ external: false, resetable: false }'
             :sorterValue='{column: "last_name", asc:true}'
             :tableFilter='{ external: false, lazy: false, placeholder:"Enter string..."}'
             :responsive="false"
             :active-page="activePage"
-            @row-clicked="rowClicked"
             :pagination="{ doubleArrows: false, align: 'center'}"
+            @row-clicked="rowClicked"
             @page-change="pageChange"
-
-          >
-            <!-- <template #status="data">
-              <td>
-                <CBadge :color="getBadge(data.item.status)">
-                  {{data.item.gender}}
-                </CBadge>
-              </td>
-            </template> -->
             
+          >
+             <template #start_date="{item}">
+              <td>
+                  {{getPrettyDate(item.start_date)}}
+              </td>
+            </template>
+             <template #active="{item}">
+              <td>
+                  <CBadge :color="getBadge(item.active)">
+                    {{getBadgeText(item.active)}}
+                  </CBadge>
+              </td>
+            </template>
           </CDataTable>
         </CCardBody>
       </CCard>
@@ -54,7 +58,8 @@ export default {
       fields: [
         { key: 'name' },
         { key: 'start_date' },
-        { key: 'active' },
+        { key: 'active', label: 'Status' },
+        { key: 'frequency' },
 
       ],
       activePage: 1
@@ -71,6 +76,21 @@ export default {
     }
   },
   methods: {
+
+    getPrettyDate (start_date) {
+      var d = new Date(start_date).toDateString();
+      return d;
+    },
+
+    getBadge (status) {
+      var color = status ? 'success' : 'danger'; // secondary, warning, danger
+      return color;
+    },
+
+    getBadgeText (status) {
+      var text = status ? 'Active' : 'Inactive';
+      return text;
+    },
    
     rowClicked (item, index) {
       this.$router.push({path: 'campaigns/' + item.id})
@@ -79,20 +99,20 @@ export default {
       this.$router.push({ query: { page: val }})
     },
     createCampaign () {
-      console.log('createCampaign');
       this.$router.push({path: 'campaigns/create'})
     },
     fetchCampaigns () {
 
-      var endpoint = '/campaigns'
-      this.$http.get(endpoint,
-      {
-          headers: {'X-Heed-Account-Id': getAccountId()},
+      var account_id = getAccountId();
+      console.log('account_id: ', account_id);
+
+      console.log('GET /campaigns');
+      this.$http.get('/campaigns', {
+          headers: {'X-Heed-Account-Id': account_id }
       })
-      
       .then((result) => {
 
-        console.log('campaign fetch result', result);
+        console.log('GET /campaigns result', result);
 
         // clean up results
         var clean = _.filter(result.data, function (r) {
@@ -100,20 +120,14 @@ export default {
         });
         
         // update data
-        // this.items = clean;
+        this.items = clean;
 
         // store
         this.$store.campaigns = clean;
-        // this.$store.commit('setCampaigns', clean);
-
-        console.log('raw result', result.data);
-        console.log('cleaned data: ', clean);
-        console.log('store: ', this.$store);
-        console.log('store getter', this.$store.getters.campaigns); // endless recursive.. something very wrong.
 
       })
       .catch((error) => {
-        console.log('axios error: ', error, error.response);
+        console.log('GET /campaigns axios error: ', error, error.response);
       });
     }
   }
