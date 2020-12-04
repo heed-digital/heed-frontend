@@ -78,7 +78,7 @@
         </CCol>
         </CRow>
         <button class="btn btn-light text-center float-right" v-on:click="onCancel" style="margin-left: 10px">Cancel</button>
-        <button class="btn btn-dark text-center float-right" v-on:click="onSubmitUser"><b>Create User</b></button>
+        <button class="btn btn-success text-center float-right" v-on:click="onSubmitUser"><b>Create User</b></button>
     </CForm>
   </div>
   </CCard>

@@ -38,6 +38,7 @@
                   </CBadge>
               </td>
             </template>
+           
           </CDataTable>
         </CCardBody>
       </CCard>

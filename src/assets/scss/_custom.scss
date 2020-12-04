@@ -8,38 +8,43 @@
   height: 1.2rem;
   font-size: 1.2rem;
 }
-
-
 .heed-logo-maximized {
   background-image: url('../public/heed-logo-for-dark-background.png');
   background-size: 110px;
   background-repeat: no-repeat;
 }
 .heed-logo-minimized {
-  background: blue;
-  background-color: blue;
-  
+  background-image: url(/img/heed-logo-for-dark-background.f9c32433.png);
+  background-size: 110px;
+  background-repeat: no-repeat;
+  width: 35px;
 }
 
 body.c-dark-theme .vdp-datepicker__calendar {
-  
   background: none;
- 
 }
-
 body.c-dark-theme .vdp-datepicker__calendar header .prev:not(.disabled):hover {
   background: #6c6e7e; 
 }
-
 body.c-dark-theme .vdp-datepicker__calendar header .next:not(.disabled):hover {
   background: #6c6e7e; 
-
 }
 body.c-dark-theme .vdp-datepicker__calendar header .up:not(.disabled):hover {
   background: #6c6e7e; 
 }
-
 body.c-dark-theme .vdp-datepicker__calendar header .next:after {
   border-left: 10px solid #ddd;
   margin-left: 5px;
+}
+body.c-dark-theme h1.title {
+  color: white;;
+}
+
+.vdp-datepicker__calendar {
+  width: 100% !important;
+}
+
+.vdp-datepicker__calendar .cell {
+  height: 30px !important;
+  line-height: 30px !important;
 }

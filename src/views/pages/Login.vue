@@ -7,7 +7,8 @@
             <CCard class="p-4">
               <CCardBody>
                 <CForm>
-                  <h1>Login</h1>
+                  <div class="heed-logo-maximized" style="width:auto; height:100px; background-size:200px;"></div>
+                  <h1 class="title">Login</h1>
                   <p class="text-muted">Sign In to your account</p>
                   <CInput
                     placeholder="Username"
@@ -26,10 +27,10 @@
                   </CInput>
                   <CRow>
                     <CCol col="4" class="text-left">
-                      <CButton color="primary" class="px-4" v-on:click="onClickSignIn">Login</CButton>
+                      <CButton color="success" class="px-4" v-on:click="onClickSignIn">Login</CButton>
                     </CCol>
                     <CCol col="8" class="text-right">
-                      <CButton color="link" class="px-0">Forgot password?</CButton>
+                      <!-- <CButton color="link" class="px-0">Forgot password?</CButton> -->
                     </CCol>
                   </CRow>
                 </CForm>
@@ -42,16 +43,10 @@
               body-wrapper
             >
               <CCardBody>
+                <br><br>
                 <h2>Sign up</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                <CButton
-                  color="light"
-                  variant="outline"
-                  size="lg"
-                  v-on:click="onClickRegister"
-                >
-                  Register Now!
-                </CButton>
+                <p><a href="https://heed.to" style="color: white; ">Contact us</a> if you would like to open an account. </p>
+                
               </CCardBody>
             </CCard>
           </CCardGroup>
@@ -72,7 +67,7 @@ export default {
   },
   methods : {
     onClickRegister () {
-      this.$router.push('/register')
+      // window.location.href = 'https://heed.to/no/demo/';
     },
 
     onClickSignIn () {
