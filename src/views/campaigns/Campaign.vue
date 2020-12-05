@@ -9,7 +9,7 @@
                 label="Campaign name"
                 placeholder="Campaign name"
                 v-on:update:value="onCampaignNameInput"
-                :value="campaignData.name"
+                :value="campaign.name"
                 />
         
                 <CSelect
@@ -18,14 +18,14 @@
                 v-on:update:value="onFrequencyInput"
                 placeholder="Set frequency"
                 description="How often learning modules are sent"
-                :value="campaignData.frequency"
+                :value="campaign.frequency"
                 />
                 <CInputCheckbox
                 label="Campaign active"
-                :checked="campaignData.active"
+                :checked="campaign.active"
                 v-on:update:checked="onCampaignActiveInput"
                 description="Campaign is active or inactive"
-                :value="campaignData.active"
+                :value="campaign.active"
                 />
             </CCol>
             <CCol sm="4">
@@ -37,7 +37,7 @@
                 :full-month-name="true" 
                 :language="nbNO" 
                 :disabled-dates="state.disabledDates"
-                :value="campaignData.start_date"
+                :value="campaign.start_date"
                 :format="datepickerFormatter"
                 @selected="onCampaignStartdateInput" 
                 >
@@ -56,8 +56,8 @@
                 <CDataTable
                 hover
                 striped
-                :items="items"
-                :fields="fields"
+                :items="table"
+                :fields="table_fields"
                 :items-per-page="20"
                 :sorter='{ external: false, resetable: false }'
                 :sorterValue='{column: "last_name", asc:true}'
@@ -80,7 +80,7 @@
         </CCol>
         </CRow>
         <button class="btn btn-light text-center float-right" v-on:click="onCancel" style="margin-left: 10px; margin-top: 20px; margin-bottom:20px">Cancel</button>
-        <button class="btn btn-success text-center float-right" v-on:click="onSubmitCampaign" style="margin-left: 10px; margin-top: 20px; margin-bottom:20px"><b>Update campaign</b></button>
+        <button class="btn btn-success text-center float-right" v-on:click="onClickUpdateCampaign" style="margin-left: 10px; margin-top: 20px; margin-bottom:20px"><b>Update campaign</b></button>
     </CForm>
   </div>
   </CCard>
@@ -97,15 +97,22 @@ export default {
     },
     data () {
         return {
-            // items : this.$store.users || this.fetchUsers(),
-            items : this.$store.campaign_users || this.getCampaignUsers(),
-            fields: [
-            { key: 'active' },
-            { key: 'first_name' },
-            { key: 'last_name' },
-            { key: 'department' },
+
+            // campaign user table:
+            table : this.$store.campaign_user_table || this.fetch_campaign_users(),
             
+            // campaign table fields
+            table_fields: [
+                { key: 'active' },
+                { key: 'first_name' },
+                { key: 'last_name' },
+                { key: 'department' },
             ],
+
+            // active campaign
+            campaign : this.$store.campaign,
+
+            // other
             message: "",
             name : 'testing',
             state : {
@@ -118,118 +125,333 @@ export default {
             activePage: 1
         }
     },
+    // runs before everything, see: https://vuejs.org/v2/api/#Options-Lifecycle-Hooks
+    beforeCreate () {
+        this.$store.campaign = (this.$store && this.$store.campaigns) ? this.$store.campaigns.find((campaign, index) => campaign.id == this.$route.params.id) : {}; // {} = !false
+        console.log('[beforeCreate]: this.$store.campaign', this.$store.campaign);
+    },
     created () {
         // this.$store.create_campaign = {}; // make sure it's clean & ready
         console.log('craeted!');
-        this.$store.campaign_users = null;
+        this.$store.campaign_user_table = null;
+    },
+    destroyed () {
+        console.log('destroyed');
+        this.$store.campaign_user_table = null;
     },
     computed : {
-        campaignData () {
-            const id = this.$route.params.id;
-            const campaign = (this.$store && this.$store.campaigns) ? this.$store.campaigns.find((campaign, index) => campaign.id == id) : false;
-            this.$store.campaign = campaign;
-            console.log('-> campaign', campaign);
-            return campaign || {};
-        },
+        // campaignData () {
+        //     this.$store.campaign = (this.$store && this.$store.campaigns) ? this.$store.campaigns.find((campaign, index) => campaign.id == this.$route.params.id) : {}; // {} = !false
+        //     console.log('[computed]: this.$store.campaign', this.$store.campaign);
+        //     return this.$store.campaign;
+        // },
     },
     methods: {
 
         getBadge (status) {
-            console.log('status', status);
             var color = status ? 'success' : 'danger'; // secondary, warning, danger
             return color;
         },
-
         getBadgeText (status) {
-            console.log('statust', status);
             var text = status ? 'Active' : 'Inactive';
             return text;
         },
-
         rowClicked (item, index) {
-            console.log('item', item);
-            // this.$router.push({path: 'users/' + item.id})
+            this.toggleActive(item);
+        },
+        toggleActive (user) {
+            if (this.isActive(user)) {
+                console.log('isActive!', user);
+                this.setInactive(user);
+            } else {
+                console.log('isInactive!', user);
+                this.setActive(user);
+            };
+        },
+        isActive (user) {
+            if (this.$store.users_in_campaign_object.hasOwnProperty(user.id)) return true;
+            return false;
+        },
+        setActive (user) {
+            this.$store.users_in_campaign_array.push(user);
+            this.$store.users_in_campaign_object = this.toObject(this.$store.users_in_campaign_array, 'id');
+            this.update_campaign_user_table();
+        },
+        setInactive (user) {
+            delete this.$store.users_in_campaign_object[user.id];
+            this.$store.users_in_campaign_array = this.toArray(this.$store.users_in_campaign_object)
+            this.update_campaign_user_table();
         },
         pageChange (val) {
             this.$router.push({ query: { page: val }})
         },
-
-        getCampaignId () {
-            console.log('getCampaignId', this.$store.campaign);
+        get_campaign_id () {
+            console.log('get_campaign_id', this.$store.campaign);
             if (!this.$store.campaign) return false;
             return this.$store.campaign.id;
         },
+        fetch_campaign_users () {
 
-        getCampaignUsers () {
-            var campaign_id = this.getCampaignId();
-            if (!campaign_id) {
-                console.log('no campaign id!');
-                return;
-            }
+            // users of account stored on account level
+            // users in campaign stored on separate key campaign:id:users
+            // our campaign GUI list must have available both lists, so we can toggle on/off
+            // users should be mutated to an object by key in GUI
+            // campaign users must be sent to API on PUT /campaigns/id/users
+            // account users should be fetched here also, since they're not always prefetched
+            // --
+            // when to get users, campaign users? asap.
+            // 
+            // --
+            // todo: 
+            // 1. get account users
+            // 2. get campaign users
+            // 3. parse into common object
+            // --
+            // API addUsers takes array of user_ids
+            // perhaps cleaner with setUsers, so no mistakes with adding/removing
+            // otherwise a lot of tinkering when adding/removing users in GUI, API call for both adding/removing
+            // although, setUsers would potentially entail sending hundreds of ids for a simple change... 
+            // this goes for all changes, what's better?! 
+            // every update on campaign entails a lot of work serverside with rescheduling, etc. 
+            // decision: add/remove
+            // --
+            // TABLE needs an array of users with active key added... ie. a special list, parsed client-side
+            // could perhaps just be added to 
 
-            var endpoint = '/campaigns/' + campaign_id + '/users';
-            console.log('GET', endpoint);
+            // -------------
+            // USERS (in account) should be stored on this.$store.users, READ-ONLY (except when editing users)
+            // CAMPAIGNS (in account) should be stored on this.$store.campaigns, READ-ONLY (except when editing campaigns)
+            // 
 
-            this.$http.get(endpoint)
-            .then((result) => {
+            // // ensure campaign id
+            // var campaign_id = this.get_campaign_id();
+            // if (!campaign_id) return console.error('no campaign_id!?')
 
-                console.log('result', result);
+
+            // get campaign users
+            this.pull_campaign_users(function () {
+
+                // get all users
+                this.pull_account_users(function () {
+
+                    // update table data
+                    this.update_campaign_user_table(); // 
+
+                }.bind(this));
+
+            }.bind(this))
+           
+        },
+
+        pull_campaign_users (callback) {
+
+            // API: get campaign users
+            this.GET_campaign_users(function (result) {
+
+                console.log('[GET_campaign_users]: result', result);
 
                 // clean up results
-                var campaign_users = _.filter(result.data, function (r) {
+                var users_in_campaign_array = _.filter(result.data, function (r) {
+                    return !(r==null);
+                });
+
+                // store as array
+                this.$store.users_in_campaign_array = _.clone(users_in_campaign_array);
+
+                // store as object
+                this.$store.users_in_campaign_object = this.toObject(users_in_campaign_array, 'id');
+
+                // store as pre-saved
+                this.$store.users_in_campaign_array_presave = _.clone(users_in_campaign_array);
+                console.error('presaving!', this.$store.users_in_campaign_array_presave);
+            
+                // done
+                callback();
+
+            }.bind(this));
+
+        },
+        GET_campaign_users (callback) {
+            this.$http.get('/campaigns/' + this.get_campaign_id() + '/users')
+            .then(callback)
+            .catch((error) => {
+                console.error('[GET_account_users]: axios error: ', error);
+                callback();
+            });
+        },
+        update_campaign_user_table () {
+            
+            // clean 
+            this.$store.campaign_user_table = [];
+
+            // iterate account users
+            this.$store.users.forEach(function (user) {
+
+                // check if user is in campaign object
+                if (this.$store.users_in_campaign_object.hasOwnProperty(user.id)) {
+                    // mark as active
+                    user.active = true;
+                } else {
+                    user.active = false;
+                }
+                // add to campaign table
+                this.$store.campaign_user_table.push(user);
+
+            }.bind(this));
+
+            // update items
+            this.table = this.$store.campaign_user_table;
+
+            // update GUI
+            this.$forceUpdate();
+        },
+
+        pull_account_users (callback) {
+
+            // GET /accounts/:id/users
+            this.GET_account_users(function (result) {
+                console.log('[GET_account_users]: result', result);
+                
+                // clean up results
+                var users = _.filter(result.data.users, function (r) {
                     return !_.isNull(r);
                 });
 
-                // these are campaign users
-                console.log('campaign_users', campaign_users);
+                // store globally
+                this.$store.users = users;
 
-                // update data
-                this.items = campaign_users; 
+                // done
+                callback();
 
-                // store
-                // this.$store.campaign_users = clean;
-
-            })
-            .catch((e) => {
-                console.log('fetchUsers axios error: ', e);
-            });
+            }.bind(this));
         },
 
+        GET_account_users (callback) {
+            this.$http.get('/accounts/' + getAccountId() + '/users')
+            .then(callback)
+            .catch((error) => {
+                console.error('[GET_account_users]: axios error: ', error);
+                callback();
+            });
+        },
+        toArray (obj) {
+            var arr = [];
+            for (var o in obj) {
+                arr.push(obj[o]);
+            }
+            return arr;
+        },
+
+        toObject (users, key) {
+            if (!users || !key) {
+                console.log('[toObject][error]:', users, key);
+                return {};
+            }
+            var sorted = {};
+            users.forEach(function (u) {
+                sorted[u[key]] = u;
+            })
+            return sorted;
+        },
         datepickerFormatter (date) {
-            console.log('datepickerFormatter', date);
             var d = new Date(date);
             return d.toDateString();
         },
-
         getChecked (active) {
             if (active) return 'checked';
             return '';
         },
-        onSubmitCampaign (val) {
+        onClickUpdateCampaign (val) {
+
+            // - save campaign (freq, name, etc.)
+            // - save added/removed users
             
-            console.log('submitCampaign', this.$store.campaign);
+            console.log('onClickUpdateCampaign', this.$store.campaign);
 
-            // set endpoint
-            var endpoint = '/campaigns/' + this.$route.params.id;
 
-            // post
-            this.$http.put(endpoint, this.$store.campaign,
-            {
-                headers: {'X-Heed-Account-Id': getAccountId()}, // todo: use cognito instead
-            })
-            .then(function (response) {
-                console.log('created new campaign: ', response);
-            })
-            .catch(function (err) {
-                console.log('axios post error: ', err, err.response);
-            });
+            // save campaign data
+            // this.push_campaign();
 
-            console.log('going to /campaigns');
+            // save campaign user data
+            this.push_campaign_users();
 
             // return to campaigns screen
             this.$router.push({path: '/campaigns'})
 
         },
+
+        push_campaign () {
+            
+            // set endpoint
+            var endpoint = '/campaigns/' + this.get_campaign_id();
+            this.$http.put(endpoint, this.$store.campaign, getHeaders())
+            .then(function (response) {
+                console.log('[push_campaign]: response ', response);
+            })
+            .catch(function (err) {
+                console.log('axios post error: ', err, err.response);
+            });
+        },
+        push_campaign_users () {
+            // determine added/removed users
+            // aka compare 
+            // - this.$store.users_in_campaign_array_presave
+            // - this.$store.users_in_campaign_array
+
+            var old_ids = _.map(this.$store.users_in_campaign_array_presave, function (i) {
+                return i.id;
+            })
+            var new_ids = _.map(this.$store.users_in_campaign_array, function (i) {
+                return i.id;
+            })
+
+            console.log('old_ids', old_ids);
+            console.log('new_ids', new_ids);
+
+            var add = _.difference(new_ids, old_ids);
+            console.log('add: ', add);
+
+            var rem = _.difference(old_ids, new_ids);
+            console.log('rem:', rem);
+
+            // add
+            this.add_campaign_users(add);
+
+            // remove
+            this.rem_campaign_users(rem);
+        },
+
+        add_campaign_users (add) {
+            if (_.isEmpty(add)) return console.log('nothing to add');
+
+            // set endpoint
+            var endpoint = '/campaigns/' + this.get_campaign_id() + '/users';
+            this.$http.put(endpoint, add, getHeaders())
+            .then(function (response) {
+                console.log('[add campaign users]: response ', response);
+            })
+            .catch(function (err) {
+                console.log('axios post error: ', err, err.response);
+            });
+        },
+         rem_campaign_users (rem) {
+            if (_.isEmpty(rem)) return console.log('nothing to rem');
+
+             // set endpoint
+            var endpoint = '/campaigns/' + this.get_campaign_id() + '/users/remove';
+            var headers = getHeaders();
+            console.log('headers', headers);
+            console.log('rem:', rem);
+            console.log('endpoint', endpoint);
+            this.$http.put(endpoint, rem, headers)
+            .then(function (response) {
+                console.log('[rem campaign users]: response ', response);
+            })
+            .catch(function (err) {
+                console.log('axios post error: ', err, err.response);
+            });
+        },
+
         onCancel () {
           console.log('cancel');
           this.$router.push({path: '/campaigns'})

@@ -82,17 +82,14 @@ export default {
       var d = new Date(start_date).toDateString();
       return d;
     },
-
     getBadge (status) {
       var color = status ? 'success' : 'danger'; // secondary, warning, danger
       return color;
     },
-
     getBadgeText (status) {
       var text = status ? 'Active' : 'Inactive';
       return text;
     },
-   
     rowClicked (item, index) {
       this.$router.push({path: 'campaigns/' + item.id})
     },
@@ -104,15 +101,9 @@ export default {
     },
     fetchCampaigns () {
 
-      var account_id = getAccountId();
-      console.log('account_id: ', account_id);
-
-      console.log('GET /campaigns');
-      this.$http.get('/campaigns', {
-          headers: {'X-Heed-Account-Id': account_id }
-      })
+      // get all campaigns in account
+      this.$http.get('/campaigns', getHeaders())
       .then((result) => {
-
         console.log('GET /campaigns result', result);
 
         // clean up results
@@ -120,7 +111,7 @@ export default {
           return !_.isNull(r);
         });
         
-        // update data
+        // update vue data
         this.items = clean;
 
         // store

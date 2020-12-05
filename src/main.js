@@ -8,6 +8,7 @@ import store from './store'
 import axios from 'axios'
 import { freeSet } from '@coreui/icons'
 import VueLuxon from "vue-luxon";
+import lodash from 'lodash';
 
 // amplify
 import Auth from '@aws-amplify/auth';
@@ -45,6 +46,10 @@ window.getAccountId = function () {
     if (!Auth.user) return '';
     return Auth.user.attributes['custom:account_id'];
 }
+window.getHeaders = function () {
+    var account_id = getAccountId(); // global fn
+    return { headers: {'X-Heed-Account-Id': account_id } }
+};
    
 // helper fn to determine secured route
 const secured_route = function (to) {
