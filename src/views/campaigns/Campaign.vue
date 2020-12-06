@@ -53,6 +53,7 @@
                 <span style="font-size: 1.4em;">Campaign users</span>
                 <br>
                 <br>
+
                 <CDataTable
                 hover
                 striped
@@ -63,17 +64,50 @@
                 :sorterValue='{column: "last_name", asc:true}'
                 :responsive="false"
                 :active-page="activePage"
-                @row-clicked="rowClicked"
                 :pagination="{ doubleArrows: false, align: 'center'}"
                 @page-change="pageChange"
                 >
                 <template #active="{item}">
                 <td>
-                    <CBadge :color="getBadge(item.active)">
-                    {{getBadgeText(item.active)}}
+                    <CBadge @click="rowClicked(item)" :color="getBadge(item.active)" style="cursor: pointer;">
+                        {{getBadgeText(item.active)}}
                     </CBadge>
                 </td>
                 </template>
+                <template #show_details="{item, index}">
+                    <td class="py-2">
+                    <CButton
+                        color="light"
+                        variant="outline"
+                        square
+                        size="sm"
+                        @click="toggleDetails(item, index)"
+                    >
+                        {{Boolean(item._toggled) ? 'Hide' : 'Show'}}
+                    </CButton>
+                    </td>
+                </template>
+                <template #details="{item}">
+                <CCollapse :show="Boolean(item._toggled)" :duration="collapseDuration">
+                <CCardBody>
+                    <!-- <CMedia :aside-image-props="{ height: 102 }"> -->
+                    <h4>
+                        {{item.first_name}} {{item.last_name}}
+                    </h4>
+                    Department: {{item.department}}<br>
+                    Employed since: {{item.employed_since}}<br>
+                    Email: {{item.email}}<br>
+                    Year born: {{item.year_born}}<br>
+                    <!-- <CButton size="sm" color="info" class="">
+                        User Settings
+                    </CButton> -->
+                    <!-- <CButton size="sm" color="danger" class="ml-1">
+                        Delete
+                    </CButton> -->
+                    <!-- </CMedia> -->
+                </CCardBody>
+                </CCollapse>
+            </template>
                 
             </CDataTable>
 
@@ -107,6 +141,7 @@ export default {
                 { key: 'first_name' },
                 { key: 'last_name' },
                 { key: 'department' },
+                { key: 'show_details', label: 'Details', _style : 'max-width: 100px; width: 90px;' }
             ],
 
             // active campaign
@@ -122,31 +157,39 @@ export default {
             },
             en : en,
             nbNO : nbNO,
-            activePage: 1
+            activePage: 1,
+            collapseDuration : 0,
         }
     },
     // runs before everything, see: https://vuejs.org/v2/api/#Options-Lifecycle-Hooks
     beforeCreate () {
-        this.$store.campaign = (this.$store && this.$store.campaigns) ? this.$store.campaigns.find((campaign, index) => campaign.id == this.$route.params.id) : {}; // {} = !false
-        console.log('[beforeCreate]: this.$store.campaign', this.$store.campaign);
+        var campaign = (this.$store && this.$store.campaigns) ? this.$store.campaigns.find((campaign, index) => campaign.id == this.$route.params.id) : {}; // {} = !false
+        this.$store.campaign = campaign;
+        this.$store.campaign_presave = _.clone(campaign);
     },
     created () {
-        // this.$store.create_campaign = {}; // make sure it's clean & ready
-        console.log('craeted!');
         this.$store.campaign_user_table = null;
     },
     destroyed () {
-        console.log('destroyed');
         this.$store.campaign_user_table = null;
     },
     computed : {
-        // campaignData () {
-        //     this.$store.campaign = (this.$store && this.$store.campaigns) ? this.$store.campaigns.find((campaign, index) => campaign.id == this.$route.params.id) : {}; // {} = !false
-        //     console.log('[computed]: this.$store.campaign', this.$store.campaign);
-        //     return this.$store.campaign;
-        // },
+    
     },
     methods: {
+
+        toggleDetails (item, idx, event) {
+            console.log('toggleDetails');
+            console.log('tiem', item, idx);
+            console.log('event', event);
+            console.log('table', this.table);
+            var i = _.find(this.table, function (t) {
+                return t.id == item.id;
+            })
+            this.$set(i, '_toggled', !item._toggled)
+            this.collapseDuration = 300
+            this.$nextTick(() => { this.collapseDuration = 0})
+        },
 
         getBadge (status) {
             var color = status ? 'success' : 'danger'; // secondary, warning, danger
@@ -156,15 +199,14 @@ export default {
             var text = status ? 'Active' : 'Inactive';
             return text;
         },
-        rowClicked (item, index) {
+        rowClicked (item, index, event) {
+            console.log('rowClicked', item, index, event);
             this.toggleActive(item);
         },
         toggleActive (user) {
             if (this.isActive(user)) {
-                console.log('isActive!', user);
                 this.setInactive(user);
             } else {
-                console.log('isInactive!', user);
                 this.setActive(user);
             };
         },
@@ -186,7 +228,6 @@ export default {
             this.$router.push({ query: { page: val }})
         },
         get_campaign_id () {
-            console.log('get_campaign_id', this.$store.campaign);
             if (!this.$store.campaign) return false;
             return this.$store.campaign.id;
         },
@@ -226,7 +267,12 @@ export default {
             // // ensure campaign id
             // var campaign_id = this.get_campaign_id();
             // if (!campaign_id) return console.error('no campaign_id!?')
-
+            // ==========
+            // todo: 5 des, 2020
+            // - implement user table in "create campaign" GUI
+            // - check and document Auth / account_id / middleware
+            // - add more info to table, with popout... see: https://coreui.io/vue/docs/components/table.html
+            // - 
 
             // get campaign users
             this.pull_campaign_users(function () {
@@ -263,7 +309,6 @@ export default {
 
                 // store as pre-saved
                 this.$store.users_in_campaign_array_presave = _.clone(users_in_campaign_array);
-                console.error('presaving!', this.$store.users_in_campaign_array_presave);
             
                 // done
                 callback();
@@ -363,14 +408,8 @@ export default {
         },
         onClickUpdateCampaign (val) {
 
-            // - save campaign (freq, name, etc.)
-            // - save added/removed users
-            
-            console.log('onClickUpdateCampaign', this.$store.campaign);
-
-
             // save campaign data
-            // this.push_campaign();
+            this.push_campaign();
 
             // save campaign user data
             this.push_campaign_users();
@@ -381,7 +420,11 @@ export default {
         },
 
         push_campaign () {
-            
+
+            if (_.isEqual(this.$store.campaign, this.$store.campaign_presave)) {
+                return console.log('nothing to save');
+            }
+
             // set endpoint
             var endpoint = '/campaigns/' + this.get_campaign_id();
             this.$http.put(endpoint, this.$store.campaign, getHeaders())
@@ -393,31 +436,27 @@ export default {
             });
         },
         push_campaign_users () {
-            // determine added/removed users
-            // aka compare 
-            // - this.$store.users_in_campaign_array_presave
-            // - this.$store.users_in_campaign_array
-
+           
+            // get ids only
             var old_ids = _.map(this.$store.users_in_campaign_array_presave, function (i) {
                 return i.id;
             })
+
+            // get ids only
             var new_ids = _.map(this.$store.users_in_campaign_array, function (i) {
                 return i.id;
             })
 
-            console.log('old_ids', old_ids);
-            console.log('new_ids', new_ids);
-
+            // find added
             var add = _.difference(new_ids, old_ids);
-            console.log('add: ', add);
 
+            // find removed
             var rem = _.difference(old_ids, new_ids);
-            console.log('rem:', rem);
 
-            // add
+            // add to API
             this.add_campaign_users(add);
 
-            // remove
+            // remove from API
             this.rem_campaign_users(rem);
         },
 
@@ -434,16 +473,12 @@ export default {
                 console.log('axios post error: ', err, err.response);
             });
         },
-         rem_campaign_users (rem) {
+        rem_campaign_users (rem) {
             if (_.isEmpty(rem)) return console.log('nothing to rem');
 
              // set endpoint
             var endpoint = '/campaigns/' + this.get_campaign_id() + '/users/remove';
-            var headers = getHeaders();
-            console.log('headers', headers);
-            console.log('rem:', rem);
-            console.log('endpoint', endpoint);
-            this.$http.put(endpoint, rem, headers)
+            this.$http.put(endpoint, rem, getHeaders())
             .then(function (response) {
                 console.log('[rem campaign users]: response ', response);
             })
@@ -453,7 +488,6 @@ export default {
         },
 
         onCancel () {
-          console.log('cancel');
           this.$router.push({path: '/campaigns'})
         },
         validator(val) {
@@ -461,18 +495,14 @@ export default {
         },
         onInput(key, val) {
             this.$store.campaign[key] = val;
-            console.log('this.store', this.$store.campaign); 
         },
         onCampaignNameInput(val) {
-            console.log('name', val);
             this.onInput('name', val);
         },
         onFrequencyInput(val) {
-            console.log('frequency', val);
             this.onInput('frequency', val);
         },
         onCampaignStartdateInput(val) {
-            console.log('SAVE start_date', val);
             this.onInput('start_date', val);
         },
         onCampaignActiveInput(val) {
