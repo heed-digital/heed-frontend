@@ -136,7 +136,7 @@
         </CRow>
         <button class="btn btn-light text-center float-right" v-on:click="onCancel" style="margin-left: 10px; margin-top: 20px; margin-bottom:20px">Cancel</button>
         <button class="btn btn-success text-center float-right" v-on:click="onClickUpdateCampaign" style="margin-left: 10px; margin-top: 20px; margin-bottom:20px"><b>Update campaign</b></button>
-        <button class="btn btn-danger text-center float-right" v-on:click="onClickDeleteCampaign" style="margin-left: 10px; margin-top: 20px; margin-bottom:20px"><b>Delete</b></button>
+        <button class="btn btn-danger text-center float-left" v-on:click="onClickDeleteCampaign" style="margin-left: 10px; margin-top: 20px; margin-bottom:20px"><b>Delete campaign</b></button>
     </CForm>
   </div>
   </CCard>
