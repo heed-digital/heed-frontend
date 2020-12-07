@@ -54,8 +54,7 @@ export default {
   name: 'Campaigns',
   data () {
     return {
-      items: this.$store.campaigns || this.fetchCampaigns(),
-      // items: this.$store.getters.campaigns || this.fetchCampaigns(), // does not work!
+      items: this.fetchCampaigns(), // fetches fresh every time
       fields: [
         { key: 'name' },
         { key: 'start_date' },

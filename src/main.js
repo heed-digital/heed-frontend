@@ -72,6 +72,7 @@ router.beforeEach(function (to, from, next) {
 
     // authenticated
     .then(function (result) {
+        console.log('authenticated: ', result);
         next();
     })
 

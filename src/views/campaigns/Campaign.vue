@@ -69,7 +69,13 @@
                 >
                 <template #active="{item}">
                 <td>
-                    <CBadge @click="rowClicked(item)" :color="getBadge(item.active)" style="cursor: pointer;">
+                    <CBadge 
+                    @click="rowClicked(item)" 
+                    :color="getBadge(item.active)" 
+                    style="cursor: pointer;"
+                    shape="pill"
+                    v-c-tooltip="'Click to toggle active status'"
+                    >
                         {{getBadgeText(item.active)}}
                     </CBadge>
                 </td>
@@ -82,6 +88,7 @@
                         square
                         size="sm"
                         @click="toggleDetails(item, index)"
+                        v-c-tooltip="'Click to show user details'"
                     >
                         {{Boolean(item._toggled) ? 'Hide' : 'Show'}}
                     </CButton>
@@ -110,11 +117,26 @@
             </template>
                 
             </CDataTable>
+            <template>
+                <CModal
+                :title=modal.title
+                color="danger"
+                :show.sync="warningModal"
+                >   
+                {{modal.content}}
+
+                <template #footer>
+                <CButton @click="onConfirmDeleteDelete" color="danger">Delete</CButton>
+                <CButton @click="onConfirmDeleteCancel" color="light">Cancel</CButton>
+                </template>
+                </CModal>
+            </template>
 
         </CCol>
         </CRow>
         <button class="btn btn-light text-center float-right" v-on:click="onCancel" style="margin-left: 10px; margin-top: 20px; margin-bottom:20px">Cancel</button>
         <button class="btn btn-success text-center float-right" v-on:click="onClickUpdateCampaign" style="margin-left: 10px; margin-top: 20px; margin-bottom:20px"><b>Update campaign</b></button>
+        <button class="btn btn-danger text-center float-right" v-on:click="onClickDeleteCampaign" style="margin-left: 10px; margin-top: 20px; margin-bottom:20px"><b>Delete</b></button>
     </CForm>
   </div>
   </CCard>
@@ -159,6 +181,13 @@ export default {
             nbNO : nbNO,
             activePage: 1,
             collapseDuration : 0,
+
+            // modal popup
+            warningModal : false,
+            modal : {
+                title : 'Confirm Delete',
+                content: 'Are you sure you want to delete campaign? This can not be undone.'
+            },
         }
     },
     // runs before everything, see: https://vuejs.org/v2/api/#Options-Lifecycle-Hooks
@@ -476,7 +505,7 @@ export default {
         rem_campaign_users (rem) {
             if (_.isEmpty(rem)) return console.log('nothing to rem');
 
-             // set endpoint
+            // set endpoint
             var endpoint = '/campaigns/' + this.get_campaign_id() + '/users/remove';
             this.$http.put(endpoint, rem, getHeaders())
             .then(function (response) {
@@ -510,6 +539,48 @@ export default {
         },
         onCampaignUserActiveCheckbox(val) {
             console.log('onCampaignUserActiveCheckbox', val);
+        },
+
+        onClickDeleteCampaign () {
+            console.log('delete campaign');
+            // this.modal.title = 'Missing information'
+            // this.modal.content = 'Please fill in the required information: \n' + missing.join(', ') + '.';
+            this.warningModal = true;
+        },
+
+        onConfirmDeleteCancel () {
+            console.log('confirm delete cancel');
+            this.warningModal = false;
+        },
+        onConfirmDeleteDelete () {
+            console.log('confirmed delete');
+            this.warningModal = false;
+
+            // delete campaign
+            this.delete_campaign();
+        },
+
+        delete_campaign () {
+            var campaign_id = this.get_campaign_id();
+            console.log('campaign_id', campaign_id);
+            console.log('this.$store.campaign',this.$store.campaign);
+
+            // set endpoint
+            var endpoint = '/campaigns/' + this.get_campaign_id();
+            this.$http.delete(endpoint, getHeaders())
+            .then(function (response) {
+                console.log('[delete campaign]: response ', response);
+            })
+            .catch(function (err) {
+                console.log('[delete campaign]: axios post error: ', err, err.response);
+            });
+
+            // return to campaigns screen
+            this.$router.push({path: '/campaigns'}, function (e) {
+                console.log('onComplete? ', e, this);
+            })
+            this.$forceUpdate();
+
         },
     }
 }

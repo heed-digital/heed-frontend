@@ -30,7 +30,8 @@
         </CHeaderNavLink>
       </CHeaderNavItem>
     </CHeaderNav> -->
-    <CHeaderNav class="mr-4">
+    <CHeaderNav class="mr-4 profile-nav-right">
+    <!-- <CHeaderNav class="px-3 profile-nav-right"> -->
       <!-- <CHeaderNavItem class="d-md-down-none mx-2">
         <CHeaderNavLink>
           <CIcon name="cil-bell"/>
